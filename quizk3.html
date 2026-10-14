@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Kursus & Kuis K3 Interaktif</title>
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #e8f5e9;
+            --secondary: #1565c0;
+            --dark: #333;
+            --light: #f9f9f9;
+            --success: #2e7d32;
+            --error: #c62828;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f4f6f8;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 0.5rem;
+        }
+        .course-section img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        .modules-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+        .modules-list li {
+            padding: 0.75rem 1rem;
+            background: var(--light);
+            margin-bottom: 0.5rem;
+            border-left: 4px solid var(--primary);
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .modules-list li:hover {
+            background: var(--primary-light);
+        }
+        .quiz-container {
+            display: none;
+        }
+        .question {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+        .options {
+            list-style: none;
+        }
+        .option-item {
+            padding: 0.75rem 1rem;
+            background: var(--light);
+            border: 1px solid #ddd;
+            margin-bottom: 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .option-item:hover {
+            background: #eee;
+            border-color: #bbb;
+        }
+        .option-item.correct {
+            background-color: #c8e6c9 !important;
+            border-color: #81c784 !important;
+            color: #1b5e20;
+        }
+        .option-item.incorrect {
+            background-color: #ffcdd2 !important;
+            border-color: #e57373 !important;
+            color: #b71c1c;
+        }
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.2s;
+        }
+        .btn:hover {
+            background: #1b5e20;
+        }
+        .btn-secondary {
+            background: var(--secondary);
+        }
+        .btn-secondary:hover {
+            background: #0d47a1;
+        }
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 6px;
+            display: none;
+            font-weight: 500;
+        }
+        .feedback.correct {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        .feedback.incorrect {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+        .quiz-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+        }
+        .score-board {
+            text-align: center;
+            padding: 2rem;
+        }
+        .score-num {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 1rem 0;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ddd;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>E-Learning Keselamatan dan Kesehatan Kerja (K3)</h1>
+        <p>Kelas Mandiri & Simulasi Ujian Kompetensi K3 Dasar</p>
+    </header>
+
+    <div class="container">
+        <!-- SEKSI KURSUS / MATERI -->
+        <div id="course-view" class="card course-section">
+            <h2>Materi Pembelajaran K3</h2>
+            <p>Silakan pelajari modul-modul di bawah ini terlebih dahulu sebelum memulai kuis evaluasi untuk menguji pemahaman Anda.</p>
+            <ul class="modules-list">
+                <li><strong>Modul 1:</strong> Pengenalan Dasar Hukum & Regulasi K3 di Indonesia</li>
+                <li><strong>Modul 2:</strong> Identifikasi Bahaya Fisik, Kimia, & Biologi di Tempat Kerja</li>
+                <li><strong>Modul 3:</strong> Hierarki Pengendalian Risiko & Manajemen APD</li>
+                <li><strong>Modul 4:</strong> Prosedur Tanggap Darurat & Penanggulangan Kebakaran</li>
+            </ul>
+            <div style="margin-top: 2rem; text-align: center;">
+                <button class="btn" onclick="startQuiz()">Mulai Ujian & Kuis K3</button>
+            </div>
+        </div>
+
+        <!-- SEKSI KUIS -->
+        <div id="quiz-view" class="card quiz-container">
+            <h2 id="quiz-title">Evaluasi K3 dengan Scoring</h2>
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <div id="question-box">
+                <p class="question" id="question-text">Loading pertanyaan...</p>
+                <ul class="options" id="options-box">
+                    <!-- Pilihan jawaban dimuat via JS -->
+                </ul>
+            </div>
+            <div id="feedback-box" class="feedback"></div>
+            <div class="quiz-footer">
+                <span id="question-counter">Pertanyaan 1 dari 5</span>
+                <button id="next-btn" class="btn btn-secondary" onclick="nextQuestion()" disabled>Pertanyaan Berikutnya</button>
+            </div>
+        </div>
+
+        <!-- SEKSI HASIL / SCORING -->
+        <div id="result-view" class="card score-board" style="display: none;">
+            <h2>Hasil Ujian Evaluasi K3</h2>
+            <p>Anda telah menyelesaikan seluruh modul kuis. Skor akhir Anda adalah:</p>
+            <div class="score-num" id="final-score">0</div>
+            <p id="score-message" style="font-weight: 500; margin-bottom: 1.5rem;"></p>
+            <button class="btn" onclick="resetQuiz()">Ulangi Kelas & Kuis</button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Manakah di bawah ini yang termasuk dalam kelompok bahaya fisik (physical hazards) di lingkungan kerja?",
+                options: [
+                    { text: "Bakteri dan virus di area medis", isCorrect: false, reason: "Bakteri dan virus termasuk dalam kelompok bahaya biologi." },
+                    { text: "Tingkat kebisingan yang tinggi dan getaran mesin", isCorrect: true, reason: "Kebisingan, getaran, suhu ekstrem, dan radiasi adalah contoh nyata dari bahaya fisik." },
+                    { text: "Stres kerja dan beban kerja berlebih", isCorrect: false, reason: "Beban kerja berlebih atau stres berkaitan dengan bahaya psikososial." },
+                    { text: "Bahan kimia pelarut organik", isCorrect: false, reason: "Bahan kimia pelarut organik termasuk dalam kategori bahaya kimia." }
+                ]
+            },
+            {
+                question: "Alat pelindung diri apa yang paling wajib digunakan pekerja las untuk melindungi matanya dari radiasi sinar ultraviolet dan percikan api?",
+                options: [
+                    { text: "Kacamata safety biasa (safety glasses)", isCorrect: false, reason: "Kacamata safety biasa tidak cukup menahan intensitas radiasi cahaya las." },
+                    { text: "Pelindung telinga (earmuffs)", isCorrect: false, reason: "Earmuffs berfungsi untuk melindungi telinga dari kebisingan." },
+                    { text: "Kedok las (welding helmet/shield)", isCorrect: true, reason: "Kedok las dilengkapi dengan kaca filter khusus yang melindungi mata dari radiasi UV/IR." },
+                    { text: "Masker debu biasa (dust mask)", isCorrect: false, reason: "Masker debu melindungi pernapasan, bukan area mata dari radiasi." }
+                ]
+            },
+            {
+                question: "Apa tindakan pertama yang paling tepat jika Anda mendengar alarm evakuasi berbunyi di gedung tempat Anda bekerja?",
+                options: [
+                    { text: "Segera menuju titik kumpul melalui jalur evakuasi terdekat dengan tenang", isCorrect: true, reason: "Mengikuti jalur evakuasi menuju titik kumpul secara teratur adalah langkah terbaik." },
+                    { text: "Menyelesaikan pekerjaan penting di meja kerja terlebih dahulu", isCorrect: false, reason: "Menunda evakuasi sangat berbahaya karena situasi darurat dapat memburuk dengan cepat." },
+                    { text: "Menggunakan lift untuk turun secepat mungkin", isCorrect: false, reason: "Jangan gunakan lift saat darurat/kebakaran karena risiko macet atau korsleting listrik." },
+                    { text: "Mencari barang-barang berharga di dalam ruangan", isCorrect: false, reason: "Utamakan keselamatan nyawa; harta benda dapat diganti." }
+                ]
+            },
+            {
+                question: "Dalam hierarki pengendalian risiko K3, metode apa yang dianggap paling efektif untuk menghilangkan bahaya sepenuhnya?",
+                options: [
+                    { text: "Substitusi (mengganti bahan)", isCorrect: false, reason: "Substitusi hanya mengurangi tingkat risiko, bukan membuangnya secara penuh." },
+                    { text: "Penggunaan Alat Pelindung Diri (APD)", isCorrect: false, reason: "APD berada di urutan terbawah karena hanya menjadi benteng pertahanan terakhir pekerja." },
+                    { text: "Eliminasi (menghilangkan sumber bahaya secara total)", isCorrect: true, reason: "Eliminasi adalah tingkat tertinggi karena sumber bahaya benar-benar dihapus secara fisik." },
+                    { text: "Pengendalian administratif", isCorrect: false, reason: "Pengendalian administratif hanya membatasi paparan lewat prosedur atau rotasi." }
+                ]
+            },
+            {
+                question: "Apa tujuan utama dari melaporkan kejadian nyaris celaka (near-miss) di tempat kerja?",
+                options: [
+                    { text: "Menghukum pekerja yang lalai", isCorrect: false, reason: "K3 modern berfokus pada perbaikan sistem keselamatan, bukan menghukum (blame culture)." },
+                    { text: "Mencegah terjadinya kecelakaan serupa yang lebih parah di masa depan", isCorrect: true, reason: "Near-miss adalah sinyal peringatan dini untuk memperbaiki celah bahaya sebelum jatuh korban." },
+                    { text: "Memenuhi formalitas laporan administrasi perusahaan", isCorrect: false, reason: "Tujuan esensialnya adalah tindakan preventif pencegahan cedera di lapangan." },
+                    { text: "Menambah beban kerja petugas K3", isCorrect: false, reason: "Pelaporan justru mempermudah tim K3 memetakan risiko tersembunyi." }
+                ]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answered = false;
+
+        function startQuiz() {
+            document.getElementById('course-view').style.display = 'none';
+            document.getElementById('quiz-view').style.display = 'block';
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            answered = false;
+            document.getElementById('next-btn').disabled = true;
+            
+            const feedbackBox = document.getElementById('feedback-box');
+            feedbackBox.style.display = 'none';
+            feedbackBox.className = 'feedback';
+
+            const currentQuestion = quizData[currentQuestionIndex];
+            
+            // Update Progress & Counter
+            document.getElementById('question-counter').innerText = `Pertanyaan ${currentQuestionIndex + 1} dari ${quizData.length}`;
+            const progressPercent = ((currentQuestionIndex) / quizData.length) * 100;
+            document.getElementById('progress-fill').style.width = `${progressPercent}%`;
+
+            // Set text
+            document.getElementById('question-text').innerText = currentQuestion.question;
+            
+            // Set options
+            const optionsBox = document.getElementById('options-box');
+            optionsBox.innerHTML = '';
+            
+            currentQuestion.options.forEach((option, index) => {
+                const li = document.createElement('li');
+                li.className = 'option-item';
+                li.innerText = option.text;
+                li.onclick = () => selectOption(li, option);
+                optionsBox.appendChild(li);
+            });
+        }
+
+        function selectOption(element, option) {
+            if (answered) return; // Mencegah klik ganda
+            answered = true;
+
+            const feedbackBox = document.getElementById('feedback-box');
+            
+            if (option.isCorrect) {
+                element.classList.add('correct');
+                feedbackBox.innerText = `Benar! ${option.reason}`;
+                feedbackBox.classList.add('correct');
+                score += 20; // 5 soal x 20 = 100 maksimal
+            } else {
+                element.classList.add('incorrect');
+                feedbackBox.innerText = `Salah. ${option.reason}`;
+                feedbackBox.classList.add('incorrect');
+                
+                // Highlight yang benar
+                const items = document.querySelectorAll('.option-item');
+                quizData[currentQuestionIndex].options.forEach((opt, idx) => {
+                    if (opt.isCorrect) {
+                        items[idx].classList.add('correct');
+                    }
+                });
+            }
+            
+            feedbackBox.style.display = 'block';
+            document.getElementById('next-btn').disabled = false;
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz-view').style.display = 'none';
+            document.getElementById('result-view').style.display = 'block';
+            
+            document.getElementById('final-score').innerText = score;
+            
+            const msgBox = document.getElementById('score-message');
+            if (score >= 80) {
+                msgBox.innerText = "Selamat! Anda lulus dengan hasil luar biasa. Pemahaman K3 Anda sangat matang.";
+                msgBox.style.color = 'var(--success)';
+            } else if (score >= 60) {
+                msgBox.innerText = "Anda Lulus Cukup. Silakan tinjau kembali beberapa materi K3 yang salah.";
+                msgBox.style.color = '#f57c00';
+            } else {
+                msgBox.innerText = "Maaf, Anda belum lulus. Silakan pelajari kembali modul materi dan coba lagi.";
+                msgBox.style.color = 'var(--error)';
+            }
+        }
+
+        function resetQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            document.getElementById('result-view').style.display = 'none';
+            document.getElementById('course-view').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
